@@ -1,0 +1,46 @@
+.sidebar {
+    width: 240px;
+    height: 100vh;
+    background-color: #fafafa; /* Tailwind's gray-800 */
+    color: #090909;
+    padding: 0px;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+  }
+  
+  .sidebar-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 30px;
+    text-align: center;
+    color: #0645b3; 
+  }
+  
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+  }
+  
+  .sidebar-item {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.1s ease;
+  }
+  
+  .sidebar-item:hover {
+    background-color: #0645b3; 
+    transform: translateX(4px);
+  }
+  
+  .logout {
+    margin-top: auto;
+    color: #f87171; 
+    font-weight: bold;
+  }
+  

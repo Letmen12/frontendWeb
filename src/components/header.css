@@ -1,0 +1,46 @@
+.header-appbar {
+    background-color: #fff !important;
+    color: #000 !important;
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 20px;
+  }
+  
+  .header-toolbar {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  
+  .notification-badge .MuiBadge-badge {
+    background-color: #10b981;
+    color: #10b981;
+  }
+  
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .user-avatar {
+    background-color: #6b7280 !important;
+  }
+  
+  .user-status-badge {
+    background-color: #ef4444;
+    border-radius: 50%;
+    padding: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    font-size: 10px;
+    color: #fff;
+  }
+  

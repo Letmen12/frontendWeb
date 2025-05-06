@@ -1,0 +1,83 @@
+.layout {
+  display: flex;
+  padding: 20;
+}
+
+.main-content {
+  flex: 1;
+  padding: 20px;
+}
+
+.step-container {
+  max-width: 60%;
+}
+
+.step-header {
+  display: flex;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.step {
+  border-radius: 6px;
+  background: #f0f0f0;
+}
+
+.step.active {
+  background-color: #1a73e8;
+  color: white;
+  font-weight: bold;
+}
+
+.type-selection {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.type-button {
+  background: white;
+  border: 1px solid #ccc;
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.type-button.active {
+  border-color: #1a73e8;
+  background-color: #eaf1fe;
+}
+
+.icon {
+  display: block;
+  font-size: 24px;
+  margin-bottom: 6px;
+}
+
+.type-description {
+  margin-top: 20px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #333;
+}
+
+.next-button {
+  margin-left: auto;
+  padding: 10px 20px;
+  background-color: #1a73e8;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.home-body {
+  display: flex;
+  width: 100%;
+  gap: 30px;
+}
+
