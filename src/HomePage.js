@@ -19,11 +19,17 @@ export default function HomePage() {
   const handleNext = () => {
     if (selectedType) setStep(2);
   };
+  const [isSidebarOpen, setSidebarOpen] = useState(true);
+
+  const toggleSidebar = () => {
+    setSidebarOpen((prev) => !prev);
+  };
 
   const renderStepContent = () => {
     if (step === 1) {
       return (
-        <div className="step-container"><div className="type-selection">
+        <div className="step-container">
+          <div className="type-selection">
             {types.map(({ label, icon }) => (
               <button
                 key={label}
@@ -76,9 +82,9 @@ export default function HomePage() {
 
   return (
     <div className="layout">
-      <Sidebar />
-      <div className="main-content">
-        <Header />
+      <Sidebar isOpen={isSidebarOpen} />
+      <div className={`main-content ${isSidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`} >
+        <Header onMenuClick={toggleSidebar} />
         <div className="home-body">
           {renderStepContent()}
         </div>

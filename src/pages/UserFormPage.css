@@ -1,23 +1,27 @@
 .form-container {
     max-width: 900px;
-    margin: 40px auto;
-    padding: 20px;
     background-color: #f0f4f8;
     border-radius: 12px;
   }
   
   .MuiCard-root {
-    padding: 20px;
+    padding: 10px;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     background-color: #ffffff;
   }
+  .header{
+    display: flex;
+    justify-content: flex-start;
+  }
+  .forms-field{
+    margin: 10px;
+  }
   
   .form-title {
     text-align: center;
-    font-size: 26px;
+    font-size: 24px;
     font-weight: 600;
-    margin-bottom: 30px;
     color: #333;
   }
   
@@ -27,8 +31,8 @@
   }
   
   .create-button {
-    margin-top: 30px;
-    background-color: #1976d2;
+    padding-top: 10px;
+    background-color: #26264b;
     color: white;
     font-weight: bold;
     font-size: 16px;
@@ -37,6 +41,6 @@
   }
   
   .create-button:hover {
-    background-color: #115293;
+    background-color: #26264b;
   }
   

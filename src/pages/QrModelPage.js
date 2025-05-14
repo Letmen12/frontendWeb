@@ -17,7 +17,6 @@ import {
 import { Download } from '@mui/icons-material';
 
 export default function QrModelPage() {
-  // read location.state.url, default to ''
   const { state } = useLocation();
   const url = state?.url ?? '';
 

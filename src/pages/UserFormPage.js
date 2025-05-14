@@ -9,16 +9,27 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import "./UserFormPage.css";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { IconButton } from "@mui/material";
+
+
+const user = JSON.parse(localStorage.getItem("user"));
+const firstName = user?.fname || "";
+const lastName = user?.lname || "";
+const email = user?.email || "";
+const phone = user?.phone || "";
+const address = user?.address || "";
 
 const UserFormPage = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    phone: "",
-    email: "",
+    firstName: firstName,
+    lastName: lastName,
+    phone: phone,
+    email: email,
     birthDate: "",
     gender: "",
+    address: address,
   });
 
   const handleChange = (e) => {
@@ -40,8 +51,15 @@ const UserFormPage = () => {
     <div className="form-container">
       <Card>
         <CardContent>
-          <Typography className="form-title">Хувийн мэдээлэл</Typography>
-
+          <div className="header" style={{ display: "flex", alignItems: "center", marginBottom: 20 }}>
+            <IconButton onClick={() => navigate("/home")}>
+            <ArrowBackIcon sx={{ fontSize: 24 }} />
+            </IconButton>
+            <Typography className="form-title" style={{ marginLeft: 10, fontSize: 20,}}>
+              Хувийн мэдээлэл
+            </Typography>
+          </div>
+          <div className="forms-field">
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
               <TextField
@@ -152,16 +170,6 @@ const UserFormPage = () => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
-                label="Өөрийн тухай"
-                name="bio"
-                multiline
-                rows={3}
-                value={formData.bio}
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
                 label="Зураг (URL хэлбэрээр)"
                 name="profileImage"
                 value={formData.profileImage}
@@ -169,6 +177,7 @@ const UserFormPage = () => {
               />
             </Grid>
           </Grid>
+          </div>
 
           <Button
             className="create-button"

@@ -1,46 +1,66 @@
 .sidebar {
-    width: 240px;
-    height: 100vh;
-    background-color: #fafafa; /* Tailwind's gray-800 */
-    color: #090909;
-    padding: 0px;
-    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    margin: 0;
-  }
-  
-  .sidebar-title {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: 30px;
-    text-align: center;
-    color: #0645b3; 
-  }
-  
-  .sidebar-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    flex-grow: 1;
-  }
-  
-  .sidebar-item {
-    padding: 12px 16px;
-    border-radius: 8px;
-    margin-bottom: 8px;
-    cursor: pointer;
-    transition: background 0.2s ease, transform 0.1s ease;
-  }
-  
-  .sidebar-item:hover {
-    background-color: #0645b3; 
-    transform: translateX(4px);
-  }
-  
-  .logout {
-    margin-top: auto;
-    color: #f87171; 
-    font-weight: bold;
-  }
-  
+  width: 250px;
+  height: 100vh;
+  background-color: #1e1e2f;
+  color: white;
+  transition: transform 0.3s ease;
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.sidebar.closed {
+  transform: translateX(-100%);
+}
+
+.sidebar.open {
+  background-color: #26264b;
+  transform: translateX(0);
+}
+
+.sider-title {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+}
+
+.profile-image {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.sidebar-title {
+  font-size: 10px;
+  font-weight: bold;
+  color: white;
+  align-items: center;
+  margin-top: 30px;
+}
+
+.sidebar-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-item {
+  padding: 15px 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid #2d2d3f;
+}
+
+.sidebar-item:hover {
+  background-color: #62629b;
+  border-radius: 20px;
+}
+
+.logout {
+  color: red;
+}

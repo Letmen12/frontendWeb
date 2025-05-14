@@ -18,31 +18,44 @@ export default function LoginForm() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
     if (!email || !password) {
-      setMessage('Имэйл болон нууц үгээ бөглөнө үү.');
+      setMessage("Имэйл болон нууц үгээ бөглөнө үү.");
       return;
     }
-  
+
     try {
-      const res = await axios.post('http://localhost:3000/api/login', { email, password });
-      localStorage.setItem('token', res.data.token);
-      setMessage('Амжилттай нэвтэрлээ!');
-      navigate('/home');
+      const response = await axios.post("http://localhost:4004/api/users/login", {
+        email,
+        password,
+      });
+
+      if (response.status === 200) {
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+        if(response.data.user.user_role_id === 2){
+          navigate("/home");
+        } else{
+          navigate("/adminPage");
+        }
+      } else {
+        setMessage("Нэвтрэх үйлдэл амжилтгүй боллоо.");
+      }
     } catch (err) {
-      console.log(err); 
+      console.error(err);
       if (err.response) {
         setMessage(err.response.data.message || "Нэвтрэх нэр эсвэл нууц үг буруу байна.");
       } else {
         setMessage("Сервертэй холбогдож чадсангүй.");
       }
     }
-  };  
-  
+  };
+
   return (
     <div className="container">
       <div className="left-panel">
         <div className="form-container">
-          <h2 className="form-title ">Нэвтрэх</h2>
+          <h2 className="form-title">Нэвтрэх</h2>
           {message && <p className="text-sm text-red-500 mb-3">{message}</p>}
           <form onSubmit={handleLogin} className="space-y-4">
             {/* Email input */}
@@ -72,6 +85,7 @@ export default function LoginForm() {
               <div
                 onClick={() => setShowPass(!showPass)}
                 className="input-icon"
+                style={{ right: "10px", cursor: "pointer" }}
               >
                 {showPass ? <FaEyeSlash /> : <FaEye />}
               </div>
@@ -79,13 +93,19 @@ export default function LoginForm() {
 
             <button type="submit" className="button primary">Нэвтрэх</button>
 
-            <button type="button" className="button google">Log in with Google</button>
+            <button type="button" className="button google">Google-ээр нэвтрэх</button>
 
-            <button type="button" className="button register"  onClick={() => navigate("/register")}>Бүртгүүлэх</button>
-
+            <button
+              type="button"
+              className="button register"
+              onClick={() => navigate("/register")}
+            >
+              Бүртгүүлэх
+            </button>
           </form>
         </div>
       </div>
+
       <div className="right-panel">
         <img src="/login.png" alt="login art" />
       </div>

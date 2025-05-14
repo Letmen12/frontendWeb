@@ -1,0 +1,65 @@
+.cards-page {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.card-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+/* Modern Card */
+.modern-card, .minimal-card {
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  padding: 16px;
+  width: 300px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  background: #fff;
+}
+
+.modern-left {
+  float: left;
+  width: 40%;
+  text-align: center;
+}
+
+.modern-right {
+  float: right;
+  width: 55%;
+}
+
+.profile-image {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+}
+
+.profile-placeholder {
+  width: 80px;
+  height: 80px;
+  background: #eee;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Minimal Template Styling */
+.header-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.profile-image-rounded {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+}
+
+.qr-wrapper {
+  margin-top: 12px;
+  text-align: center;
+}
