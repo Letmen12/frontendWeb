@@ -34,7 +34,6 @@ export default function OrderRow({ order, index }) {
       <td>{order.email}</td>
       <td>{order.paper_type}</td>
       <td>{order.created_date}</td>
-      <td>{order.paperType}</td>
       <td>{order.quantity}</td>
       <td>{order.unit_price}</td>
       <td>

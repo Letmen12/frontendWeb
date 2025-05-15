@@ -3,8 +3,6 @@ import axios from "axios";
 import {
   FaEnvelope,
   FaLock,
-  FaEye,
-  FaEyeSlash,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import "./login.css";
@@ -87,7 +85,6 @@ export default function LoginForm() {
                 className="input-icon"
                 style={{ right: "10px", cursor: "pointer" }}
               >
-                {showPass ? <FaEyeSlash /> : <FaEye />}
               </div>
             </div>
 
@@ -105,9 +102,8 @@ export default function LoginForm() {
           </form>
         </div>
       </div>
-
       <div className="right-panel">
-        <img src="/login.png" alt="login art" />
+        <img src="/login.png" alt="login art" className="login-image" />
       </div>
     </div>
   );

@@ -1,0 +1,39 @@
+.view-card{
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; 
+  height: 100%;
+  width: 200px;
+}
+.modern-card {
+  display: flex;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.modern-left {
+  background: #1f2937;
+  color: white;
+  padding: 24px;
+  width: 35%; 
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; 
+  box-sizing: border-box;
+}
+
+.modern-right {
+  padding: 24px;
+  width: 65%;
+  box-sizing: border-box;
+  position: relative; 
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}

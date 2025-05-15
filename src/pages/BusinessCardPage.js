@@ -1,23 +1,63 @@
 import React, { useState, useRef } from 'react';
-import { QRCodeSVG } from 'qrcode.react';
 import axios from 'axios';
+import QRCode from 'react-qr-code';
 import './BusinessCardPage.css';
+
+const DraggableText = ({ children, defaultPosition }) => {
+  const [position, setPosition] = useState(defaultPosition);
+  const [dragging, setDragging] = useState(false);
+  const offset = useRef({ x: 0, y: 0 });
+
+  const handleMouseDown = (e) => {
+    setDragging(true);
+    offset.current = {
+      x: e.clientX - position.x,
+      y: e.clientY - position.y,
+    };
+  };
+
+  const handleMouseMove = (e) => {
+    if (!dragging) return;
+    setPosition({
+      x: e.clientX - offset.current.x,
+      y: e.clientY - offset.current.y,
+    });
+  };
+
+  const handleMouseUp = () => setDragging(false);
+
+  return (
+    <div
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      style={{
+        position: 'absolute',
+        left: `${position.x}px`,
+        top: `${position.y}px`,
+        cursor: 'move',
+        userSelect: 'none',
+      }}
+    >
+      {children}
+    </div>
+  );
+};
 
 export default function BusinessCardPage() {
   const [message, setMessage] = useState('');
   const [showDialog, setShowDialog] = useState(false);
   const [orderNote, setOrderNote] = useState('');
+  const [showQr, setShowQr] = useState(false);
+  const qrRef = useRef(null);
   const previewRef = useRef(null);
 
   const rawUser = localStorage.getItem("user");
   const user = rawUser ? JSON.parse(rawUser) : {};
   const user_id = user?.id?.toString() || '';
-
+  const viewerUrl = `http://192.168.37.118:3000/UserProfilePage`;
+  const [qrUrl, setQrUrl] = useState(`http://192.168.37.118:3000/UserProfilePage`);
   const [templateId, setTemplateId] = useState('');
-
-  const viewerUrl = templateId
-    ? `http://localhost:3000/business-card/${templateId}`
-    : 'http://localhost:3000/home';
 
   const [form, setForm] = useState({
     name: user?.fname || '',
@@ -30,6 +70,16 @@ export default function BusinessCardPage() {
     template: 'modern',
     user_id: user_id
   });
+
+  const [theme, setTheme] = useState({
+    backgroundColor: '#ffffff',
+    fontColor: '#000000',
+    fontFamily: 'Arial',
+    textAlign: 'left',
+    textTransform: 'none'
+  });
+
+  const [activeTab, setActiveTab] = useState('info');
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -45,13 +95,32 @@ export default function BusinessCardPage() {
     reader.readAsDataURL(file);
   };
 
+  const handleThemeChange = (e) => {
+    setTheme({ ...theme, [e.target.name]: e.target.value });
+  };
+
+  const toggleQrCode = async () => {
+    const newTemplateId = await createTemplate();
+    if (newTemplateId) {
+      setTemplateId(newTemplateId); 
+      setQrUrl(`http://192.168.37.118:3000/business-card/${newTemplateId}`);
+      setShowQr((prev) => !prev);
+    }
+  };
+
+
   const createTemplate = async () => {
+    const hasTemplate = await checkExistingTemplate();
+    if (hasTemplate) {
+      setMessage("Та аль хэдийн 5 бизнес карт үүсгэсэн байна.");
+      return null;
+    }
     try {
       const response = await axios.post("http://localhost:4004/api/templates/create", form);
       if (response.status === 201 || response.data.success) {
-        console.log("Template create response:", response.data);
-
-        return response.data.template._id?.toString();
+        const newId = response.data.template._id?.toString();
+        setTemplateId(newId); 
+        return newId; 
       } else {
         setMessage("Бизнес карт үүсгэхэд алдаа гарлаа.");
         return null;
@@ -62,32 +131,22 @@ export default function BusinessCardPage() {
       return null;
     }
   };
-  // const checkExistingTemplate = async () => {
-  //   try {
-  //     const res = await axios.get(`http://localhost:4004/api/templates/user/${user_id}`);
-  //     return res.data.templates.length >= 10;
-  //   } catch (err) {
-  //     console.error("Error checking templates:", err);
-  //     return false;
-  //   }
-  // };
+
+
+  const checkExistingTemplate = async () => {
+    try {
+      const res = await axios.get(`http://localhost:4004/api/templates/count/${user_id}`);
+      return res.data.templates.length >= 5;
+    } catch (err) {
+      console.error("Error checking templates:", err);
+      return false;
+    }
+  };
 
   const order = async () => {
-    // const hasTemplate = await checkExistingTemplate();
-    // if (hasTemplate) {
-    //   setMessage("Та аль хэдийн бизнес карт үүсгэсэн байна.");
-    //   return;
-    // }
-
-    const template_id = await createTemplate(); 
-    if (!template_id) {
-      return;
-    }
-
     const order_date = new Date().toISOString();
     const total_price = 10000;
     const order_type = "waiting";
-
 
     try {
       const orderRes = await axios.post("http://localhost:4004/api/orders/create", {
@@ -104,7 +163,7 @@ export default function BusinessCardPage() {
           return;
         }
 
-        const orderDetailPayload = {
+        const detailRes = await axios.post("http://localhost:4004/api/orderDetails/create", {
           order_id,
           user_id,
           quantity: 1,
@@ -116,17 +175,11 @@ export default function BusinessCardPage() {
           username: user.fname,
           email: user.email,
           phone: user.phone,
-          template_id
-        };
-
-        const detailRes = await axios.post("http://localhost:4004/api/orderDetails/create", orderDetailPayload);
+        });
 
         if (detailRes.status === 201 || detailRes.data.success) {
           setMessage("Захиалга амжилттай бүртгэгдлээ!");
-          setTemplateId(template_id);
-          setTimeout(() => {
-            setShowDialog(false)
-          }, 2000);
+          setTimeout(() => setShowDialog(false), 2000);
         } else {
           setMessage("Order detail үүсгэхэд алдаа гарлаа.");
         }
@@ -134,32 +187,29 @@ export default function BusinessCardPage() {
     } catch (error) {
       console.error("Order error:", error);
       setMessage("Алдаа гарлаа: " + error.message);
-    } 
+    }
   };
 
   const renderModernTemplate = () => (
-    <div className="card modern-card">
+    <div className="modern-card" style={{ ...theme, position: 'relative', height: '250px' }}>
       <div className="modern-left">
         {form.profileImage ? (
           <img src={form.profileImage} alt="Profile" className="profile-image" />
         ) : (
           <div className="profile-placeholder">👤</div>
         )}
-        <QRCodeSVG value={viewerUrl} size={106} />
       </div>
-      <div className="modern-right">
-        <h2>{form.name}</h2>
-        <p>{form.title} at {form.company}</p>
-        <div className="contact-info">
-          <p>📞 {form.phone}</p>
-          <p>✉️ {form.email}</p>
-        </div>
+      <div className="modern-right" style={{ position: 'relative' }}>
+        <DraggableText defaultPosition={{ x: 10, y: 10 }}><h2>{form.name}</h2></DraggableText>
+        <DraggableText defaultPosition={{ x: 10, y: 50 }}><p>{form.title} at {form.company}</p></DraggableText>
+        <DraggableText defaultPosition={{ x: 10, y: 90 }}><p>📞 {form.phone}</p></DraggableText>
+        <DraggableText defaultPosition={{ x: 10, y: 130 }}><p>✉️ {form.email}</p></DraggableText>
       </div>
     </div>
   );
 
   const renderMinimalTemplate = () => (
-    <div className="card minimal-card enhanced-minimal-card">
+    <div className="modern-card" style={theme}>
       <div className="header-section">
         {form.profileImage ? (
           <img src={form.profileImage} alt="Profile" className="profile-image-rounded" />
@@ -176,9 +226,60 @@ export default function BusinessCardPage() {
         <p><strong>📞</strong> {form.phone}</p>
         <p><strong>✉️</strong> {form.email}</p>
       </div>
-      <div className="qr-wrapper">
-        <QRCodeSVG value={viewerUrl} size={106} />
+    </div>
+  );
+
+  const renderInfoForm = () => (
+    <form className="card-form" onSubmit={(e) => e.preventDefault()}>
+      <div className="form-grid">
+        <input name="name" value={form.name} onChange={handleChange} placeholder="Full Name" />
+        <input name="title" value={form.title} onChange={handleChange} placeholder="Job Title" />
+        <input name="company" value={form.company} onChange={handleChange} placeholder="Company Name" />
+        <input name="phone" value={form.phone} onChange={handleChange} placeholder="Phone Number" />
+        <input name="email" value={form.email} onChange={handleChange} placeholder="Email" />
+        <input name="website" value={form.website} onChange={handleChange} placeholder="Website" />
       </div>
+      <div className="upload-section">
+        <label>Upload Profile Image</label>
+        <input type="file" accept="image/*" onChange={handleImageUpload} />
+      </div>
+      <div className="template-select">
+        <label>Select Template</label>
+        <select name="template" value={form.template} onChange={handleChange}>
+          <option value="modern">Modern Template</option>
+          <option value="minimal">Minimal Template</option>
+        </select>
+      </div>
+    </form>
+  );
+
+  const renderDesignEditor = () => (
+    <div className="panel">
+      <h3>Edit Design</h3>
+      <label>Background Color</label>
+      <input type="color" name="backgroundColor" value={theme.backgroundColor} onChange={handleThemeChange} />
+      <label>Font Color</label>
+      <input type="color" name="fontColor" value={theme.fontColor} onChange={handleThemeChange} />
+      <label>Font Family</label>
+      <select name="fontFamily" value={theme.fontFamily} onChange={handleThemeChange}>
+        <option value="Arial">Arial</option>
+        <option value="Georgia">Georgia</option>
+        <option value="Courier New">Courier New</option>
+        <option value="Tahoma">Tahoma</option>
+      </select>
+      <label>Text Align</label>
+      <select name="textAlign" value={theme.textAlign} onChange={handleThemeChange}>
+        <option value="left">Left</option>
+        <option value="center">Center</option>
+        <option value="right">Right</option>
+      </select>
+      <label>Text Transform</label>
+      <select name="textTransform" value={theme.textTransform} onChange={handleThemeChange}>
+        <option value="none">None</option>
+        <option value="uppercase">UPPERCASE</option>
+        <option value="lowercase">lowercase</option>
+        <option value="capitalize">Capitalize</option>
+      </select>
     </div>
   );
 
@@ -186,36 +287,26 @@ export default function BusinessCardPage() {
     <div className="page-container">
       <h1>Бизнес карт үүсгэх</h1>
       <div className='row-container'>
-        <form className="card-form" onSubmit={(e) => e.preventDefault()}>
-          <div className="form-grid">
-            <input name="name" value={form.name} onChange={handleChange} placeholder="Full Name" />
-            <input name="title" value={form.title} onChange={handleChange} placeholder="Job Title" />
-            <input name="company" value={form.company} onChange={handleChange} placeholder="Company Name" />
-            <input name="phone" value={form.phone} onChange={handleChange} placeholder="Phone Number" />
-            <input name="email" value={form.email} onChange={handleChange} placeholder="Email" />
-            <input name="website" value={form.website} onChange={handleChange} placeholder="Website" />
-          </div>
-
-          <div className="upload-section">
-            <label>Upload Profile Image</label>
-            <input type="file" accept="image/*" onChange={handleImageUpload} />
-          </div>
-
-          <div className="template-select">
-            <label>Select Template</label>
-            <select name="template" value={form.template} onChange={handleChange}>
-              <option value="modern">Modern Template</option>
-              <option value="minimal">Minimal Template</option>
-            </select>
-          </div>
-        </form>
-
         <div className="preview-wrapper" ref={previewRef}>
           {form.template === 'modern' ? renderModernTemplate() : renderMinimalTemplate()}
+          <div className="qr-code-section">
+            <button onClick={toggleQrCode} className='qr-title'>{showQr ? 'Qr код дахин үүсгэх' : 'Qr код үүсгэх '}</button>
+              {showQr && (
+                <div ref={qrRef} >
+                  <QRCode value={qrUrl} size={106} />
+                </div>
+              )}
+          </div>
           <button className="order-button" onClick={() => setShowDialog(true)}>Захиалах</button>
         </div>
+        <div className="right-column">
+          <div className="tabs">
+            <button onClick={() => setActiveTab('info')} className={activeTab === 'info' ? 'active' : ''}>Info</button>
+            <button onClick={() => setActiveTab('design')} className={activeTab === 'design' ? 'active' : ''}>Design</button>
+          </div>
+          {activeTab === 'info' ? renderInfoForm() : renderDesignEditor()}
+        </div>
       </div>
-
       {showDialog && (
         <div className="modal-overlay">
           <div className="payment-modal">
@@ -256,7 +347,7 @@ export default function BusinessCardPage() {
             )}
 
             <button className="confirm-order" onClick={order}>
-              {'Захиалах'}
+              Төлбөр төлөх
             </button>
           </div>
         </div>

@@ -1,100 +1,93 @@
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import './CardsPage.css';
 
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { QRCodeSVG } from "qrcode.react";
-import "./CardsPage.css"; 
-
-const CardsPage = () => {
-  const [cards, setCards] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const rawUser = localStorage.getItem("user");
+export default function CardsPage() {
+  const rawUser = localStorage.getItem('user');
   const user = rawUser ? JSON.parse(rawUser) : {};
   const user_id = user?.id?.toString() || '';
+
+  const [templates, setTemplates] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchTemplates = async () => {
       try {
-        const res = await axios.get("http://localhost:4004/api/templates/${user_id}");
-        setCards(res.data);
-      } catch (err) {
-        console.error("Error fetching templates", err);
-      } finally {
-        setLoading(false);
+        const response = await axios.get(`http://192.168.37.118:4004/api/templates/filter/${user_id}`);
+        const data = response.data.templates || [];
+
+        console.log('Fetched Templates:', data);
+        setTemplates(data);
+      } catch (error) {
+        console.error('Error fetching templates:', error);
       }
     };
 
     fetchTemplates();
-  }, []);
+  }, [user_id]);
 
-  const renderModernTemplate = (form) => {
-    const viewerUrl = `http://localhost:3000/view/${form._id}`;
-    return (
-      <div key={form._id} className="card modern-card">
-        <div className="modern-left">
-          {form.profileImage ? (
-            <img src={form.profileImage} alt="Profile" className="profile-image" />
-          ) : (
-            <div className="profile-placeholder">👤</div>
-          )}
-          <QRCodeSVG value={viewerUrl} size={106} />
-        </div>
-        <div className="modern-right">
-          <h2>{form.name}</h2>
-          <p>{form.title} at {form.company}</p>
-          <div className="contact-info">
-            <p>📞 {form.phone}</p>
-            <p>✉️ {form.email}</p>
-          </div>
-        </div>
+  const handleBackToHome = () => {
+    navigate('/home');
+  };
+
+  const renderModernTemplate = (template, index) => (
+    <div key={index} className="template-card modern-cards">
+      <div className="modern-left">
+        {template.profileImage ? (
+          <img src={template.profileImage} alt="Profile" className="profile-image" />
+        ) : (
+          <div className="profile-placeholder">👤</div>
+        )}
       </div>
-    );
-  };
-
-  const renderMinimalTemplate = (form) => {
-    const viewerUrl = `http://localhost:3000/view/${form._id}`;
-    return (
-      <div key={form._id} className="card minimal-card">
-        <div className="header-section">
-          {form.profileImage ? (
-            <img src={form.profileImage} alt="Profile" className="profile-image-rounded" />
-          ) : (
-            <div className="profile-placeholder">👤</div>
-          )}
-          <div className="text-info">
-            <h2>{form.name}</h2>
-            <p>{form.title}</p>
-            <p>{form.company}</p>
-          </div>
-        </div>
-        <div className="contact-section">
-          <p><strong>📞</strong> {form.phone}</p>
-          <p><strong>✉️</strong> {form.email}</p>
-        </div>
-        <div className="qr-wrapper">
-          <QRCodeSVG value={viewerUrl} size={106} />
-        </div>
-      </div>
-    );
-  };
-
-  const renderCards = () => {
-    return cards.map((card) => {
-      return card.template === "modern"
-        ? renderModernTemplate(card)
-        : renderMinimalTemplate(card);
-    });
-  };
-
-  if (loading) return <div>Loading...</div>;
-
-  return (
-    <div className="cards-page">
-      <h1>Your Business Cards</h1>
-      <div className="card-list">
-        {cards.length > 0 ? renderCards() : <p>No cards available</p>}
+      <div className="modern-right">
+        <h2>{template.name}</h2>
+        <p>{template.title} at {template.company}</p>
+        <p>📞 {template.phone}</p>
+        <p>✉️ {template.email}</p>
       </div>
     </div>
   );
-};
 
-export default CardsPage;
+  const renderMinimalTemplate = (template, index) => (
+    <div key={index} className="template-card minimal-card">
+      <div className="header-section">
+        {template.profileImage ? (
+          <img src={template.profileImage} alt="Profile" className="profile-image-rounded" />
+        ) : (
+          <div className="profile-placeholder">👤</div>
+        )}
+        <div className="text-info">
+          <h2 className="name-text">{template.name}</h2>
+          <p className="job-title">{template.title}</p>
+          <p className="company-name">{template.company}</p>
+        </div>
+      </div>
+      <div className="contact-section">
+        <p><strong>📞</strong> {template.phone}</p>
+        <p><strong>✉️</strong> {template.email}</p>
+      </div>
+    </div>
+  );
+
+  const renderCard = (template, index) => {
+    if (template.template === 'modern') {
+      return renderModernTemplate(template, index);
+    } else {
+      return renderMinimalTemplate(template, index);
+    }
+  };
+
+  return (
+    <div className="view-card">
+        <button onClick={() => navigate(-1)} className="back-button" aria-label="Back">
+          ←
+        </button>
+      {templates.length === 0 ? (
+        <div>Loading...</div>
+      ) : (
+        templates.map((template, index) => renderCard(template, index))
+      )}
+    </div>
+  );
+}

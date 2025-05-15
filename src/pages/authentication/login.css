@@ -1,28 +1,50 @@
-body, html {
+  html, body {
     margin: 0;
+    height: 100vh;
     font-family: 'Segoe UI', sans-serif;
     background-color: #f5f7ff;
-    height: 100%;
   }
-  
+
   .container {
     display: flex;
-    height: 100%;
-  }
-  
-  .left-panel {
+    height: 100vh; /* Fill entire viewport */
     width: 100%;
+    overflow: hidden;
+  }
+
+  .left-panel {
+    width: 50%;
     background-color: #f5f7ff;
     display: flex;
-    align-items: top;
-    justify-content: top;
-    padding: 5rem;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+  }
+
+  .form-container {
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .right-panel {
+    width: 50%;
+    background-color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .login-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
   
   .left-panel .form-container {
     width: 100%;
     max-width: 400px;
   }
+  
   
   .form-title {
     font-size: 1.5rem;
@@ -138,22 +160,5 @@ body, html {
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
     transition: 0.2s ease;
   }
-
-  
-  .right-panel {
-    flex: 0;
-    width: 50%;
-    display: none;
-  }
-  
-  @media (min-width: 768px) {
-    .right-panel {
-      display: block;
-    }
-    .right-panel img{
-      object-fit: cover;
-    }
-  }
-  
   
   

@@ -7,10 +7,13 @@
   transition: width 0.3s ease, 
   margin-left 0.3s ease;
 }
+.home-body{
+  padding: 20px;
+}
 
 .main-content.sidebar-open {
-  width: calc(100% - 300px); 
-  margin-left: 300px;
+  width: calc(100% - 230px); 
+  margin-left: 230px;
 }
 
 .main-content.sidebar-closed {

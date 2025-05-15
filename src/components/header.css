@@ -16,11 +16,6 @@
     gap: 16px;
   }
   
-  .notification-badge .MuiBadge-badge {
-    background-color: #10b981;
-    color: #10b981;
-  }
-  
   .user-info {
     display: flex;
     align-items: center;
