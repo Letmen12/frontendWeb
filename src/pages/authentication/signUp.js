@@ -165,7 +165,7 @@ export default function RegisterForm() {
         </div>
       </div>
       <div className="right-panel">
-        <img src="/login.png" alt="register art" />
+        <img src="/login.png" alt="login art" className="login-image" />
       </div>
     </div>
   );

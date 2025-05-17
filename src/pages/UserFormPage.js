@@ -48,7 +48,7 @@ const UserFormPage = () => {
   };
 
   return (
-    <div className="form-container">
+    <div className="user-form-container">
       <Card>
         <CardContent>
           <div className="header" style={{ display: "flex", alignItems: "center", marginBottom: 20 }}>

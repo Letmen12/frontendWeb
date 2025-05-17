@@ -14,7 +14,7 @@ export default function CardsPage() {
   useEffect(() => {
     const fetchTemplates = async () => {
       try {
-        const response = await axios.get(`http://192.168.37.118:4004/api/templates/filter/${user_id}`);
+        const response = await axios.get(`http://localhost:4004/api/templates/filter/${user_id}`);
         const data = response.data.templates || [];
 
         console.log('Fetched Templates:', data);
@@ -26,10 +26,6 @@ export default function CardsPage() {
 
     fetchTemplates();
   }, [user_id]);
-
-  const handleBackToHome = () => {
-    navigate('/home');
-  };
 
   const renderModernTemplate = (template, index) => (
     <div key={index} className="template-card modern-cards">
@@ -84,7 +80,7 @@ export default function CardsPage() {
           ←
         </button>
       {templates.length === 0 ? (
-        <div>Loading...</div>
+        <div className='center-title'>Одоогоор та нэрийн хуудас үүсгээгүй байна.</div>
       ) : (
         templates.map((template, index) => renderCard(template, index))
       )}

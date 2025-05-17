@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './OffersPage.css';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 export default function OffersPage() {
   const navigate = useNavigate();
@@ -9,6 +10,10 @@ export default function OffersPage() {
   const [selectedOffer, setSelectedOffer] = useState(null);
   const [orderNote, setOrderNote] = useState('');
   const [message, setMessage] = useState('');
+  const rawUser = localStorage.getItem("user");
+  const user = rawUser ? JSON.parse(rawUser) : {};
+  const user_id = user?.id?.toString() || '';
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
 
   const offers = [
     {
@@ -20,7 +25,8 @@ export default function OffersPage() {
         'Шууд тусламж дэмжлэг авах',
         '10 хүртэлх Нэрийн хуудас үүсгэх эрх',
         'Нэрийн хуудас-н утгыг хүссэн үедээ солих'
-      ]
+      ],
+      offer_type: 'qr-1'
     },
     {
       title: 'QR-2 БАГЦ',
@@ -31,7 +37,8 @@ export default function OffersPage() {
         'Шууд тусламж дэмжлэг авах',
         '50 хүртэлх Нэрийн хуудас үүсгэх эрх',
         'Нэрийн хуудас-н утгыг хүссэн үедээ солих'
-      ]
+      ],
+      offer_type: 'qr-2'
     },
     {
       title: 'СУПЕР БАГЦ',
@@ -41,7 +48,8 @@ export default function OffersPage() {
         'Бүгдийг шингээсэн:',
         'QGeneret.mn БОЛОВСРОЛ БАГЦ',
         'QGeneret.mn QR-2 БАГЦ',
-      ]
+      ],
+      offer_type: 'super'
     }
   ];
 
@@ -52,12 +60,22 @@ export default function OffersPage() {
     setMessage('');
   };
 
-  const order = () => {
-    // Simulate order processing
-    setMessage("Захиалга амжилттай хийгдлээ!");
-    setTimeout(() => {
-      setShowDialog(false);
-    }, 1500);
+  const order = async () => {
+    try {
+      const response = await axios.put(`http://localhost:4004/api/users/update-offer-type/${user_id}`, {
+        offer_type: selectedOffer.offer_type,
+      });
+
+      if (response.status === 200) {
+        setShowDialog(false);
+        setShowSuccessDialog(true);
+      } else {
+        setMessage("Багц идэвхжүүлэхэд алдаа гарлаа.");
+      }
+    } catch (error) {
+      console.error("Error updating offer:", error);
+      setMessage("Сервертэй холбогдоход алдаа гарлаа.");
+    }
   };
 
   return (
@@ -114,8 +132,16 @@ export default function OffersPage() {
                 {message}
               </p>
             )}
-
             <button className="confirm-order" onClick={order}>Захиалах</button>
+          </div>
+        </div>
+      )}
+      {showSuccessDialog && (
+        <div className="modal-backdrop">
+          <div className="modal-content">
+            <h2>Амжилттай</h2>
+            <p>Амжилттай багц идэвхжүүллээ.</p>
+            <button onClick={() => setShowSuccessDialog(false)} className="confirm-order">Хаах</button>
           </div>
         </div>
       )}

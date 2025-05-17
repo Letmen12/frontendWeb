@@ -62,7 +62,7 @@
   height: 100%;
   width: 40%;
 }
-.modern-card {
+.view-modern-card {
   display: flex;
   background: white;
   border-radius: 10px;
@@ -70,30 +70,27 @@
   width: 100%;
   margin-bottom: 20px;
   overflow: hidden;
-  /* flex-direction row is default */
 }
 
 .modern-left {
   background: #1f2937;
   color: white;
   padding: 24px;
-  width: 35%; /* Give it a reasonable width */
+  width: 35%; 
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center; /* vertically center content */
+  justify-content: center;
   box-sizing: border-box;
 }
 
 .modern-right {
   padding: 24px;
-  width: 65%; /* Remaining width */
+  width: 65%; 
   box-sizing: border-box;
-  position: relative; /* Needed if children are absolutely positioned */
   display: flex;
   flex-direction: column;
-  justify-content: center;
 }
 
 .right-column {
@@ -119,16 +116,8 @@
 }
 
 .tabs button.active {
-  background: #007bff;
+  background: #1f2937;
   color: white;
-}
-.modern-right{
-  padding-left: 20px;
-}
-
-.modern-right h2 {
-  font-size: 22px;
-  margin-bottom: 8px;
 }
 
 .contact-info p {
@@ -228,15 +217,12 @@
   color: white;
   font-size: 1rem;
   border: none;
-  border-radius: 5px;
+  border-radius: 20px;
   cursor: pointer;
   width: 100%;
   height: 50px;
 }
 
-.order-button:hover {
-  background-color: #26264b; 
-}
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -385,38 +371,170 @@ body.modal-open {
 }
 
 .panel {
-  display: flex;
-  flex-direction: column;
-  width: 250px;
-  gap: 10px;
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 20px;
+  width: 92%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .panel h3 {
-  margin-bottom: 10px;
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 22px;
+  color: #333;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+.panel label {
+  display: block;
+  margin: 15px 0 5px;
+  font-weight: 500;
+  color: #444;
+}
+
+.panel input[type="color"],
+.panel select {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #f9f9f9;
+  transition: border-color 0.3s ease;
+}
+
+.panel input[type="color"]:hover,
+.panel select:hover {
+  border-color: #999;
+}
+
+.panel select {
+  cursor: pointer;
+}
+
+.qr-content{
+  margin-top: 30px;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.qr-content h2{
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  font-weight: bold;
+  width: 240px;
+}
+
+.qr-border{
+  justify-content: start;
+  align-items: center;
+  height: 120px;
+  width: 130px;
+  background-color: #1f2937;
+  border-radius: 20px;
+  padding-top: 10px;
 }
 
 .qr-wrapper {
-  margin-top: 16px;
   display: flex;
-  justify-content: center;
-}
-.qr-title{
-  font-size: 10px;
+  align-items: center;
   justify-content: center;
 }
 
-.qr-code-section {
-  display: flex;
-  justify-items: center;
-  padding: 20px;
+.qr-code-section{
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
 
 .qr-code-section button {
+  margin-left: 20px;
   all: unset;
   cursor: pointer;
   color: black;
   font-size: 16px;
 }
 
+.qr-title {
+  font-size: 16px;
+  font-weight: 600;
+  font-family: 'Arial', sans-serif;
+  color: #ffffff;
+  background-color: #007bff;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 10px;
+}
 
+@media (max-width: 768px) {
+  .row-container {
+    flex-direction: column;
+    padding: 10px;
+  }
+
+  .preview-wrapper {
+    width: 100%;
+    margin-top: 20px;
+  }
+
+  .modern-card {
+    display: flex;
+    width: 100%;
+  }
+
+  .modern-left{
+    width: 40%;
+    text-align: center;
+  }
+
+  .modern-right {
+    padding-left: 16px;
+    padding-right: 16px;
+    justify-content: flex-start;
+  }
+
+  .modern-right p{
+    font-size: 12px;
+  }
+
+  .enhanced-minimal-card {
+    width: 100%;
+    max-width: 100%;
+    padding: 16px;
+  }
+
+  .header-section {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .text-info {
+    width: 100%;
+  }
+
+  .qr-content {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .qr-content h2 {
+    font-size: 14px;
+    text-align: center;
+    width: 100%;
+  }
+
+  .qr-border {
+    width: 100px;
+    height: 100px;
+    margin-top: 10px;
+  }
+}
 

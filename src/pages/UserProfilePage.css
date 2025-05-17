@@ -8,13 +8,10 @@
   position: relative;
 }
 
-.back-button {
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  background-color: white;
+.user-back-button {
+  background-color: rgb(13, 12, 12);
+  margin-bottom: 20px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  z-index: 10;
 }
 
 .profile-card {
@@ -87,6 +84,11 @@
   color: #555;
   margin-bottom: 4px;
 }
+
+.button {
+  margin-top: 20px;
+}
+
 
 @media (max-width: 600px) {
   .profile-header {

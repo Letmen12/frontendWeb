@@ -7,7 +7,7 @@
   /* Menu */
   .menu {
     width: 250px;
-    background-color: #1e1e2f;
+    background-color: #26264b;
     box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
     padding: 1.5rem;
   }
@@ -27,7 +27,7 @@
     margin-bottom: 1rem;
     font-size: 15px;
     background-color: transparent;
-    color: #1f2937;
+    color: #e8ebf0;
     transition: background 0.2s;
     border: none;
   }
@@ -46,7 +46,11 @@
   }
   
   .menu-nav button:hover {
-    background-color: #e5e7eb;
+    background-color: #1e3a8a;
+  }
+  .menu-nav button.Users-info {
+    background-color: #1e3a8a;
+    color: white;
   }
   
   .menu-nav button.active {

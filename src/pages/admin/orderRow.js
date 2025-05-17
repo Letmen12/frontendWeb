@@ -42,9 +42,9 @@ export default function OrderRow({ order, index }) {
           onChange={handleStatusChange}
           className={`status-select ${status}`}
         >
-          <option value="waiting">waiting</option>
-          <option value="success">success</option>
-          <option value="payment">payment</option>
+          <option value="Илгээсэн">Илгээсэн</option>
+          <option value="Дууссан">Дууссан</option>
+          <option value="Цуцалсан">Цуцалсан</option>
         </select>
       </td>
     </tr>

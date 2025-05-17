@@ -2,7 +2,12 @@ import React, { useState, useRef } from 'react';
 import axios from 'axios';
 import QRCode from 'react-qr-code';
 import './BusinessCardPage.css';
+import { useNavigate } from 'react-router-dom';
 
+
+const qrButtonStyle = {
+  fontWeight: 'bold'
+};
 const DraggableText = ({ children, defaultPosition }) => {
   const [position, setPosition] = useState(defaultPosition);
   const [dragging, setDragging] = useState(false);
@@ -51,13 +56,110 @@ export default function BusinessCardPage() {
   const [showQr, setShowQr] = useState(false);
   const qrRef = useRef(null);
   const previewRef = useRef(null);
+  const navigate = useNavigate();
+  const [createdOrderId, setOrderId] = useState('');
+  const [createdDetailId, setOrderDetailId] = useState('');
 
   const rawUser = localStorage.getItem("user");
   const user = rawUser ? JSON.parse(rawUser) : {};
   const user_id = user?.id?.toString() || '';
   const viewerUrl = `http://192.168.37.118:3000/UserProfilePage`;
-  const [qrUrl, setQrUrl] = useState(`http://192.168.37.118:3000/UserProfilePage`);
-  const [templateId, setTemplateId] = useState('');
+  const [qrUrl, setQrUrl] = useState(`http://192.168.6.118:3000/business-card/`);
+  const [, setTemplateId] = useState('');
+
+  const order = async () => {
+    setShowDialog(true)
+    const order_date = new Date().toISOString();
+    const total_price = 10000;
+    const order_type = "Илгээсэн";
+
+    try {
+      // Create Order
+      const orderRes = await axios.post("http://localhost:4004/api/orders/create", {
+        user_id,
+        order_date,
+        total_price,
+        order_type,
+      });
+
+      if (orderRes.status === 201) {
+        const order_id = orderRes.data.order?._id?.toString();
+        if (!order_id) {
+          setMessage("Order ID олдсонгүй.");
+          return;
+        }
+
+        // Store globally
+        setOrderId(order_id);
+
+        // Create Order Detail
+        const detailRes = await axios.post("http://localhost:4004/api/orderDetails/create", {
+          order_id,
+          user_id,
+          quantity: 1,
+          side: form.template === "modern" ? 2 : 1,
+          paper_type: form.template,
+          description: orderNote || `Template: ${form.template}, Name: ${form.name}`,
+          status: order_type,
+          unit_price: total_price,
+          username: user.fname,
+          email: user.email,
+          phone: user.phone,
+        });
+
+        setOrderDetailId(detailRes.data?._id);
+
+        setMessage("Захиалга амжилттай үүслээ!");
+      }
+    } catch (error) {
+      console.error("Order error:", error);
+      setMessage("Алдаа гарлаа: " + error.message);
+    }
+  };
+
+  const payment = async () => {
+    try {
+      if (!createdOrderId || !createdDetailId) {
+        setMessage("Order эсвэл OrderDetail ID олдсонгүй.");
+        return;
+      }
+
+      await axios.put(`http://localhost:4004/api/orderDetails/${createdDetailId}`, {
+        status: "Дууссан",
+      });
+
+      await axios.put(`http://localhost:4004/api/orders/${createdOrderId}`, {
+        order_type: "Дууссан",
+      });
+
+      setMessage("Төлбөр амжилттай. Захиалга дууссан.");
+      setTimeout(() => setShowDialog(false), 2000);
+    } catch (error) {
+      console.error("Payment error:", error);
+      setMessage("Төлбөрийн алдаа: " + error.message);
+    }
+  };
+
+  const inactive = async () => {
+    try {
+      if (!createdOrderId || !createdDetailId) {
+        setMessage("Order эсвэл OrderDetail ID олдсонгүй.");
+        return;
+      }
+
+      await axios.put(`http://localhost:4004/api/orderDetails/${createdDetailId}`, {
+        status: "Илгээсэн",
+      });
+
+      await axios.put(`http://localhost:4004/api/orders/${createdOrderId}`, {
+        order_type: "Илгээсэн",
+      });
+      setShowDialog(false);
+    } catch (error) {
+      console.error("Payment error:", error);
+      setMessage("Төлбөрийн алдаа: " + error.message);
+    }
+  };
 
   const [form, setForm] = useState({
     name: user?.fname || '',
@@ -68,7 +170,8 @@ export default function BusinessCardPage() {
     website: viewerUrl,
     profileImage: '',
     template: 'modern',
-    user_id: user_id
+    user_id: user_id,
+    offer_type: user?.offer_type
   });
 
   const [theme, setTheme] = useState({
@@ -100,21 +203,22 @@ export default function BusinessCardPage() {
   };
 
   const toggleQrCode = async () => {
+    const hasReachedLimit = await checkExistingTemplate();
+    if (hasReachedLimit >= 5) {
+      setMessage("Та аль хэдийн 5 бизнес карт үүсгэсэн байна.");
+      navigate('/offers'); 
+      return null;         
+    }
     const newTemplateId = await createTemplate();
     if (newTemplateId) {
       setTemplateId(newTemplateId); 
-      setQrUrl(`http://192.168.37.118:3000/business-card/${newTemplateId}`);
+      setQrUrl(`http://192.168.6.118:3000/business-card/${newTemplateId}`);
       setShowQr((prev) => !prev);
     }
   };
 
 
   const createTemplate = async () => {
-    const hasTemplate = await checkExistingTemplate();
-    if (hasTemplate) {
-      setMessage("Та аль хэдийн 5 бизнес карт үүсгэсэн байна.");
-      return null;
-    }
     try {
       const response = await axios.post("http://localhost:4004/api/templates/create", form);
       if (response.status === 201 || response.data.success) {
@@ -136,57 +240,10 @@ export default function BusinessCardPage() {
   const checkExistingTemplate = async () => {
     try {
       const res = await axios.get(`http://localhost:4004/api/templates/count/${user_id}`);
-      return res.data.templates.length >= 5;
+      return res.data.count;
     } catch (err) {
       console.error("Error checking templates:", err);
       return false;
-    }
-  };
-
-  const order = async () => {
-    const order_date = new Date().toISOString();
-    const total_price = 10000;
-    const order_type = "waiting";
-
-    try {
-      const orderRes = await axios.post("http://localhost:4004/api/orders/create", {
-        user_id,
-        order_date,
-        total_price,
-        order_type,
-      });
-
-      if (orderRes.status === 201) {
-        const order_id = orderRes.data.order?._id?.toString();
-        if (!order_id) {
-          setMessage("Order ID олдсонгүй.");
-          return;
-        }
-
-        const detailRes = await axios.post("http://localhost:4004/api/orderDetails/create", {
-          order_id,
-          user_id,
-          quantity: 1,
-          side: form.template === "modern" ? 2 : 1,
-          paper_type: form.template,
-          description: orderNote || `Template: ${form.template}, Name: ${form.name}`,
-          status: orderRes.data.order?.order_type,
-          unit_price: total_price,
-          username: user.fname,
-          email: user.email,
-          phone: user.phone,
-        });
-
-        if (detailRes.status === 201 || detailRes.data.success) {
-          setMessage("Захиалга амжилттай бүртгэгдлээ!");
-          setTimeout(() => setShowDialog(false), 2000);
-        } else {
-          setMessage("Order detail үүсгэхэд алдаа гарлаа.");
-        }
-      }
-    } catch (error) {
-      console.error("Order error:", error);
-      setMessage("Алдаа гарлаа: " + error.message);
     }
   };
 
@@ -240,11 +297,11 @@ export default function BusinessCardPage() {
         <input name="website" value={form.website} onChange={handleChange} placeholder="Website" />
       </div>
       <div className="upload-section">
-        <label>Upload Profile Image</label>
-        <input type="file" accept="image/*" onChange={handleImageUpload} />
+        <label>Зураг оруулах</label>
+        <input type="file" accept="image/*" onChange={handleImageUpload}/>
       </div>
       <div className="template-select">
-        <label>Select Template</label>
+        <label>Загвар сонгох</label>
         <select name="template" value={form.template} onChange={handleChange}>
           <option value="modern">Modern Template</option>
           <option value="minimal">Minimal Template</option>
@@ -255,7 +312,6 @@ export default function BusinessCardPage() {
 
   const renderDesignEditor = () => (
     <div className="panel">
-      <h3>Edit Design</h3>
       <label>Background Color</label>
       <input type="color" name="backgroundColor" value={theme.backgroundColor} onChange={handleThemeChange} />
       <label>Font Color</label>
@@ -290,14 +346,20 @@ export default function BusinessCardPage() {
         <div className="preview-wrapper" ref={previewRef}>
           {form.template === 'modern' ? renderModernTemplate() : renderMinimalTemplate()}
           <div className="qr-code-section">
-            <button onClick={toggleQrCode} className='qr-title'>{showQr ? 'Qr код дахин үүсгэх' : 'Qr код үүсгэх '}</button>
+            <button onClick={toggleQrCode} className='qr-title' style={qrButtonStyle}>
+            {showQr ? 'Qr код дахин үүсгэх' : 'Qr код үүсгэх '}</button>
               {showQr && (
-                <div ref={qrRef} >
-                  <QRCode value={qrUrl} size={106} />
+                <div className='qr-content'>
+                  <div className='qr-border'>
+                    <div ref={qrRef} className='qr-wrapper'>
+                      <QRCode value={qrUrl} size={106} />
+                    </div>
+                  </div>
+                  <h2>Та зөвхөн 5 удаа нэрийн хуудасны qr үүсгэх эрхтэй.</h2>
                 </div>
               )}
           </div>
-          <button className="order-button" onClick={() => setShowDialog(true)}>Захиалах</button>
+          <button className="order-button" onClick={order}>Захиалах</button>
         </div>
         <div className="right-column">
           <div className="tabs">
@@ -312,7 +374,7 @@ export default function BusinessCardPage() {
           <div className="payment-modal">
             <div className="payment-header">
               <h3>Төлбөр төлөх</h3>
-              <button onClick={() => setShowDialog(false)} className="close-btn">×</button>
+              <button onClick={inactive} className="close-btn">×</button>
             </div>
 
             <p className="payment-title">Төлбөрийн хэрэгсэл сонгоно уу</p>
@@ -346,7 +408,7 @@ export default function BusinessCardPage() {
               </p>
             )}
 
-            <button className="confirm-order" onClick={order}>
+            <button className="confirm-order" onClick={payment}>
               Төлбөр төлөх
             </button>
           </div>

@@ -10,27 +10,33 @@ export default function Sidebar({ isOpen }) {
     localStorage.removeItem('token');
     navigate('/login');
   };
+  function handleRefresh() {
+      window.location.reload();
+    }
+
 
   return (
     <div className={`sidebar ${isOpen ? 'open' : 'closed'}`}>
-      <div className='sider-title'>
-      <img src="/logo.png" alt="Profile" className="profile-image" />
+      <div className='sider-title' onClick={handleRefresh} style={{ cursor: 'pointer' }}>
+        <img src="/logo.png" alt="Profile" className="profile-image" />
         <h3 className="sidebar-title">QGeneret.mn</h3>
       </div>
-      <ul className="sidebar-list">
-        <li className="sidebar-item" onClick={() => navigate('/orders')}>
-          <FaList /> Миний захиалгууд
-        </li>
-        <li className="sidebar-item" onClick={() => navigate('/cardsPage')}>
-          <FaCartPlus />Нэрийн хуудасууд
-        </li>
-        <li className="sidebar-item" onClick={() => navigate('/offers')}>
-          <FaTags /> Үнийн санал
-        </li>
+      <div className='sidebar-content'>
+        <ul className="sidebar-list">
+          <li className="sidebar-item" onClick={() => navigate('/orders')}>
+            <FaList /> Миний захиалгууд
+          </li>
+          <li className="sidebar-item" onClick={() => navigate('/cardsPage')}>
+            <FaCartPlus />Нэрийн хуудасууд
+          </li>
+          <li className="sidebar-item" onClick={() => navigate('/offers')}>
+            <FaTags /> Үнийн санал
+          </li>
+        </ul>
         <li className="sidebar-item logout" onClick={handleLogout}>
           <FaSignOutAlt /> Системээс гарах
         </li>
-      </ul>
+      </div>
     </div>
   );
 }

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import html2canvas from 'html2canvas';
+import './BusinessCardViewerPage.css';
 
 export default function BusinessCardViewerPage() {
   const { id } = useParams();
@@ -9,7 +11,7 @@ export default function BusinessCardViewerPage() {
   useEffect(() => {
     const fetchTemplate = async () => {
       try {
-        const response = await axios.get(`http://192.168.37.118:4004/api/templates/user/${id}`);
+        const response = await axios.get(`http://192.168.6.118:4004/api/templates/user/${id}`);
         const data = response.data.templates;
         console.log('Fetched Template:', data);
 
@@ -32,7 +34,7 @@ export default function BusinessCardViewerPage() {
   };
 
   const renderModernTemplate = () => (
-    <div className="modern-card" style={{ ...theme, position: 'relative', height: '250px' }}>
+    <div className="view-modern-card">
       <div className="modern-left">
         {template.profileImage ? (
           <img src={template.profileImage} alt="Profile" className="profile-image" />
@@ -70,11 +72,27 @@ export default function BusinessCardViewerPage() {
     </div>
   );
 
+  const handleDownload = () => {
+    const cardElement = document.querySelector('.my-view-card');
+
+    html2canvas(cardElement).then((canvas) => {
+      const link = document.createElement('a');
+      link.download = `${template.name}-business-card.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }).catch((error) => {
+      console.error('Download failed:', error);
+    });
+  };
+
   if (!template) return <div>Loading...</div>;
 
   return (
-    <div style={{ padding: '40px' }} className='view-card'>
-      {template.template === 'modern' ? renderModernTemplate() : renderMinimalTemplate()}
+    <div>
+      <div style={{ padding: '40px' }} className='my-view-card'>
+        {template.template === 'modern' ? renderModernTemplate() : renderMinimalTemplate()}
+      </div>
+      <button onClick={handleDownload} className='download-button'>Татаж авах</button>
     </div>
   );
 }

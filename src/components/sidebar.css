@@ -1,7 +1,7 @@
 .sidebar {
   width: 250px;
   height: 100vh;
-  background-color: #1e1e2f;
+  background-color: #1f2937;
   color: white;
   transition: transform 0.3s ease;
   position: fixed;
@@ -9,6 +9,12 @@
   left: 0;
   overflow-y: auto;
   z-index: 1000;
+}
+.sidebar-content{
+  display: flex;
+  height: 80%;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .sidebar.closed {
